@@ -1667,8 +1667,17 @@ class OvercookedGridworld(object):
             )
         )
         old_positions = tuple(p.position for p in old_player_states)
-        new_positions = self._handle_collisions(old_positions, new_positions)
+        new_positions = self._handle_collisions_n(old_positions, new_positions)
         return new_positions, new_orientations
+
+    def _handle_collisions_n(self, old_positions, new_positions):
+        ans_positions=copy.deepcopy(new_positions)
+        for idx0, idx1 in itertools.combinations(range(self.num_players),2):
+            p1_old, p2_old = old_positions[idx0], old_positions[idx1]
+            p1_new, p2_new = new_positions[idx0], new_positions[idx1]
+            if (p1_new == p2_new) or (p1_new == p2_old and p1_old == p2_new):
+                ans_positions[idx0], ans_positions[idx1] = p1_old, p2_old
+        return ans_positions 
 
     def is_transition_collision(self, old_positions, new_positions):
         # Checking for any players ending in same square
